@@ -1,0 +1,82 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+    defaultConfig {
+        applicationId "com.example.f.buildapk"
+        minSdkVersion 15
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        release {
+            storeFile file("../demo.keystore")
+            storePassword "123456"
+            keyAlias "android"
+            keyPassword "123456"
+        }
+        debug {
+            storeFile file("../demo.keystore")
+            storePassword "123456"
+            keyAlias "android"
+            keyPassword "123456"
+        }
+    }
+    buildTypes {
+
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+
+        }
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+        }
+
+    }
+
+    productFlavors {
+        sourceChannel {}
+    }
+
+}
+
+def app_name = "build_test"
+
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        def outputFile = output.outputFile
+        if (outputFile != null && outputFile.name.endsWith('.apk')) {
+
+            def outFileName = app_name
+            if (android.defaultConfig.versionName != null) {
+                outFileName = outFileName + "_" + android.defaultConfig.versionName + "_" + new Date().format('yyyy-MM-dd') + "_" + productFlavors[0].name + ".apk"
+            }
+            if (project.hasProperty("output_dir")) {
+                output.outputFile = new File(project.property("output_dir"), outFileName)
+            } else {
+                output.outputFile = new File(getBuildFile().getParentFile().getParent() + "\\build-lib\\apks", outFileName)
+            }
+
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    testCompile 'junit:junit:4.12'
+    compile 'com.meituan.android.walle:payload_reader:1.0.3'
+}

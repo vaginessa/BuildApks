@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.meituan.android.walle:payload_writer:1.0.2'
+    compile 'org.json:json:20080701'
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
